@@ -16,16 +16,16 @@ class GroqProvider implements AiInterface {
         });
 
         const response: any = await client.chat.completions.create({
-            model: "allam-2-7b",
+            model: "llama-3.3-70b-versatile",
             messages: messages,
         });
 
         let content = response.choices[0].message.content;
-        
+
         // Clean up trailing dashes and empty lines
         content = content.replace(/(\n\s*-\s*)*$/g, '');
         content = content.replace(/-+$/g, '');
-        
+
         return content.trim();
     }
 }
