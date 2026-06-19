@@ -13,10 +13,17 @@
     "sk-openrouter-key...",
     "sk-nvidia-key..."
   ],
-  "personaPath": "src/config/persona.txt"
+  "personaPath": "src/config/persona.txt",
+  "tools": [
+    {
+      "name": "get products",
+      "description": "les produits de rizk design",
+      "url": "https://dummyjson.com/products",
+      "method": "GET"
+    }
+  ]
 }
 ').response
 
 ```
-
 
