@@ -8,13 +8,15 @@ export class AiRouterService {
         this.chatService = new ChatService();
     }
 
-    async routeRequestWithFallback(fallbackChain: Array<ProviderType | string>, messages: Array<object>) {
+    async routeRequestWithFallback(fallbackChain: Array<ProviderType | string>, messages: Array<object>, apiKeys?: string[]) {
         let lastError = null;
 
-        for (const provider of fallbackChain) {
+        for (let i = 0; i < fallbackChain.length; i++) {
+            const provider = fallbackChain[i];
+            const apiKey = apiKeys && apiKeys.length > i ? apiKeys[i] : undefined;
             try {
                 console.log(`[Router] sending l'request to provider: ${provider}...`);
-                const response = await this.chatService.sendMessage(provider, messages);
+                const response = await this.chatService.sendMessage(provider, messages, apiKey);
                 console.log(`[Router] success with provider: ${provider} ✅`);
                 return response;
             } catch (error: any) {

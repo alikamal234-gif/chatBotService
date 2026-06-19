@@ -6,9 +6,9 @@ import path from 'path';
 // Load .env from the root of the project
 dotenv.config({ path: path.join(__dirname, '../../../.env') });
 class NvidiaProvider implements AiInterface {
-    async chat(messages: any[]): Promise<any[]> {
+    async chat(messages: any[], apiKey?: string): Promise<any[]> {
         const openai = new OpenAI({
-            apiKey: process.env.NVIDIA_API_KEY,
+            apiKey: apiKey || process.env.NVIDIA_API_KEY,
             baseURL: 'https://integrate.api.nvidia.com/v1',
         })
 

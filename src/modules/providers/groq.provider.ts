@@ -9,9 +9,9 @@ dotenv.config({ path: path.join(__dirname, '../../../.env') });
 
 class GroqProvider implements AiInterface {
 
-    async chat(messages: Array<any>): Promise<Array<object>> {
+    async chat(messages: Array<any>, apiKey?: string): Promise<Array<object>> {
         const client = new OpenAI({
-            apiKey: process.env.GROA_AI_API,
+            apiKey: apiKey || process.env.GROA_AI_API,
             baseURL: "https://api.groq.com/openai/v1",
         });
 

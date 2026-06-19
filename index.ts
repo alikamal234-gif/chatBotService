@@ -35,19 +35,35 @@ try {
 app.post('/api/chat', async (req: Request, res: Response): Promise<any> => {
     try {
         const userMessages = req.body.messages;
+        const apiKeys = req.body.apiKeys;
+        const customPersonaPath = req.body.personaPath;
 
         if (!userMessages || !Array.isArray(userMessages)) {
             return res.status(400).json({ error: "Invalid request. 'messages' array is required." });
         }
 
+        if (apiKeys && !Array.isArray(apiKeys)) {
+            return res.status(400).json({ error: "Invalid request. 'apiKeys' must be an array." });
+        }
+
+        let currentSystemPrompt = systemPrompt;
+
+        if (customPersonaPath) {
+            try {
+                currentSystemPrompt = fs.readFileSync(path.resolve(customPersonaPath), 'utf-8');
+            } catch (e: any) {
+                console.log(`[Config] Custom persona file not found at ${customPersonaPath}, falling back to default.`);
+            }
+        }
+
         // Add the persona as the system message at the beginning
         const fullMessages = [
-            { role: 'system', content: systemPrompt },
+            { role: 'system', content: currentSystemPrompt },
             ...userMessages
         ];
 
         console.log("Incoming request, sending to providers...");
-        const response: any = await router.routeRequestWithFallback(fallbackChain, fullMessages);
+        const response: any = await router.routeRequestWithFallback(fallbackChain, fullMessages, apiKeys);
 
         return res.status(200).json({ response });
     } catch (error: any) {

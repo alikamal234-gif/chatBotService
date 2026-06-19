@@ -1,3 +1,3 @@
 export interface AiInterface {
-    chat(messages: Array<object>): Promise<Array<object>>;
+    chat(messages: Array<object>, apiKey?: string): Promise<Array<object>>;
 }

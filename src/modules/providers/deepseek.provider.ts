@@ -5,10 +5,10 @@ import path from 'path';
 
 dotenv.config({ path: path.join(__dirname, '../../../.env') });
 class DeepSeekProvider implements AiInterface {
-    async chat(messages: Array<any>): Promise<Array<any>> {
+    async chat(messages: Array<any>, apiKey?: string): Promise<Array<any>> {
         const openai = new OpenAI({
             baseURL: 'https://api.deepseek.com',
-            apiKey: process.env.DEEPSEEK_API_KEY,
+            apiKey: apiKey || process.env.DEEPSEEK_API_KEY,
         });
         const completion: any = await openai.chat.completions.create({
             messages: messages,
