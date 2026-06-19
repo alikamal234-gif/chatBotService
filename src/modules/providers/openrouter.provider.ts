@@ -8,9 +8,9 @@ import path from 'path';
 dotenv.config({ path: path.join(__dirname, '../../../.env') });
 
 class OpenRouterProvider implements AiInterface {
-    async chat(messages: Array<any>): Promise<Array<object>> {
+    async chat(messages: Array<any>, apiKey?: string): Promise<Array<object>> {
         const client = new OpenRouter({
-            apiKey: process.env.OPENROUTER_API_KEY,
+            apiKey: apiKey || process.env.OPENROUTER_API_KEY,
         });
         const completion = await client.chat.send({
             chatRequest: {

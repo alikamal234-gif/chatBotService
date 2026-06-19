@@ -5,10 +5,9 @@ import path from "path";
 
 dotenv.config({ path: path.join(__dirname, '../../../.env') });
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_AI_API });
-
 class GeminiProvider implements AiInterface {
-    async chat(messages: Array<any>): Promise<Array<object>> {
+    async chat(messages: Array<any>, apiKey?: string): Promise<Array<object>> {
+        const ai = new GoogleGenAI({ apiKey: apiKey || process.env.GEMINI_AI_API });
         const systemMessage = messages.find(m => m.role === 'system')?.content;
         const userMessage = messages.filter(m => m.role !== 'system').map(m => m.content).join('\n');
 
