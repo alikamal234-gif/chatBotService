@@ -68,10 +68,15 @@ app.post('/api/chat', async (req: Request, res: Response): Promise<any> => {
             currentSystemPrompt += `\n\nYou have access to the following tools: ${JSON.stringify(toolDescriptions)}. If you need to use a tool to fulfill the user's request, you MUST respond with ONLY a JSON object in this exact format, with no markdown formatting or other text:\n{"action": "tool_call", "tool": "tool_name", "arguments": { "arg1": "value" }}`;
         }
 
-        // Add the persona as the system message at the beginning
+        // Combine all system messages into one, so providers that only take one system message (like Gemini) get everything
+        const combinedSystemContent = currentSystemPrompt + '\n\n' + userMessages
+            .filter((m: any) => m.role === 'system')
+            .map((m: any) => m.content)
+            .join('\n\n');
+
         const fullMessages = [
-            { role: 'system', content: currentSystemPrompt },
-            ...userMessages
+            { role: 'system', content: combinedSystemContent },
+            ...userMessages.filter((m: any) => m.role !== 'system')
         ];
 
         console.log("Incoming request, sending to providers...");
@@ -79,19 +84,19 @@ app.post('/api/chat', async (req: Request, res: Response): Promise<any> => {
 
         if (tools && Array.isArray(tools) && tools.length > 0) {
             const toolCall = ToolValidator.tryParseToolCall(response);
-            
+
             if (toolCall) {
                 console.log(`[Tool] AI requested to call tool: ${toolCall.tool}`);
                 const allowedTool = ToolValidator.validateAllowedTool(toolCall, tools);
-                
+
                 if (allowedTool) {
                     const executor = new ToolExecutor();
                     const result = await executor.execute(allowedTool, toolCall);
-                    
+
                     fullMessages.push({ role: 'assistant', content: JSON.stringify(toolCall) });
-                    fullMessages.push({ 
-                        role: 'user', 
-                        content: `Tool Execution Result for ${toolCall.tool}:\n${JSON.stringify(result)}\n\nNow, generate the final response to the user based on this tool result.` 
+                    fullMessages.push({
+                        role: 'user',
+                        content: `Tool Execution Result for ${toolCall.tool}:\n${JSON.stringify(result)}\n\nNow, generate the final response to the user based on this tool result.`
                     });
 
                     console.log(`[Tool] Sending tool result back to AI...`);

@@ -16,7 +16,17 @@ export class AiRouterService {
             const apiKey = apiKeys && apiKeys.length > i ? apiKeys[i] : undefined;
             try {
                 console.log(`[Router] sending l'request to provider: ${provider}...`);
-                const response = await this.chatService.sendMessage(provider, messages, apiKey);
+                let response: any = await this.chatService.sendMessage(provider, messages, apiKey);
+                
+                // Clean up <think> blocks globally for all models/providers
+                if (typeof response === 'string') {
+                    response = response.replace(/<think>[\s\S]*?(<\/think>|$)/gi, '').trim();
+                } else if (Array.isArray(response) && typeof response[0] === 'string') {
+                    response = response[0].replace(/<think>[\s\S]*?(<\/think>|$)/gi, '').trim();
+                } else if (Array.isArray(response)) {
+                    response = String(response[0]);
+                }
+
                 console.log(`[Router] success with provider: ${provider} ✅`);
                 return response;
             } catch (error: any) {

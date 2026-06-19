@@ -15,7 +15,7 @@ class NvidiaProvider implements AiInterface {
 
         const completion: any = await openai.chat.completions.create({
             model: "nvidia/nemotron-3-ultra-550b-a55b",
-            messages: [{ "role": "user", "content": messages[messages.length - 1]?.content || 'Hello' }],
+            messages: messages,
             temperature: 1,
             top_p: 0.95,
             max_tokens: 1024,
